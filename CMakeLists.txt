@@ -26,3 +26,4 @@ include_directories(${CMAKE_SOURCE_DIR}/minisat)
 add_executable(threads input.cpp)
 # link MiniSAT libraries
 target_link_libraries(threads minisat-lib-static)
+target_link_libraries(threads helper ${CMAKE_THREAD_LIBS_INIT})
