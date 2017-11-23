@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-project(ece650-a4)
+project(ece650-project)
+
+find_package (Threads)
+## ECE650 Specific configuration start here
+## Project specific configurations go here
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/minisat")
   add_subdirectory(minisat)
@@ -23,7 +27,3 @@ add_executable(threads input.cpp)
 # link MiniSAT libraries
 target_link_libraries(threads minisat-lib-static)
 
-# create the executable for tests
-# add_executable(test test.cpp)
-# link MiniSAT libraries
-# target_link_libraries(test minisat-lib-static)
