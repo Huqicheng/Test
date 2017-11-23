@@ -7,23 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <algorithm>
-#include <errno.h>
 #include <pthread.h>
 #include <iostream>
-#include <memory>
-#ifndef _HELPER_H_
-#define _HELPER_H_    1
 
 
-enum {
-   LOCK,
-   UNLOCK,
-};
-
-extern void errp(char *s, int code);
-extern void thr_sleep(time_t sec, long nsec);
-extern void mulock(int ul, pthread_mutex_t *m);
-#endif
 
 #define MAXVEX 100
 #define QueueSize 100
