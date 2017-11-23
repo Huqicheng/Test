@@ -2,6 +2,7 @@
 #include "minisat/core/SolverTypes.h"
 // defines Solver
 #include "minisat/core/Solver.h"
+#include "helper.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
