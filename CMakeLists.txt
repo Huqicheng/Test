@@ -18,9 +18,6 @@ include_directories(${CMAKE_SOURCE_DIR}/minisat)
 
 add_subdirectory(helper)
 
-add_subdirectory(tinout)
-
-
 add_executable(input input.cpp)
 # link minisat library with the main executable
 target_link_libraries(input minisat-lib-static)
