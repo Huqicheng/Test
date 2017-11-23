@@ -16,7 +16,7 @@
 #define QueueSize 100
 typedef char VertexType;
 typedef int EdgeType;
-using namespace std;
+//using namespace std;
 int v = 0;
 
 class MGraph {
