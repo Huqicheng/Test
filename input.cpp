@@ -1,10 +1,10 @@
 #include "input.h"
 #include "helper.h"
+
 int main(){
     
     char V;
     MGraph G;
-    //int retcode;
     pthread_t thread_cnf,thread_approx1,thread_approx2;
     
     while (std::cin >> V) {
@@ -23,12 +23,6 @@ int main(){
         }
         else{
 			int flagNoEdge = 0;
-			/*for (int i = 0; i < v; ++i) {
-			for (int j = 0; j < v; ++j) {
-			std::cout << (&G)->arc[i][j] << "  ";
-			}
-			std::cout << std::endl;
-			}*/
 
 			for (int i = 0; i < v; ++i) {
 				if (flagNoEdge == 2) {
@@ -54,12 +48,8 @@ int main(){
 			}
 			else {
 				void *result_cnf, *result_approx1, *result_approx2;
+				
 				// Create thread for CNF_SAT_VC
-				//            retcode = pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G);
-				//            if(retcode) {
-				//                errp("pthread_create(out)", retcode);
-				//                return 0;
-				//            }
 				if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
 					puts("fail to create pthread thread_cnf");
 					exit(1);
