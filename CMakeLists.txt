@@ -16,7 +16,7 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -Wall ${CMAKE_CXX_FLAGS}")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/minisat)
 
-#add_subdirectory(helper)
+add_subdirectory(helper)
 
 add_executable(input input.cpp)
 # link minisat library with the main executable
