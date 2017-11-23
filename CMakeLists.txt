@@ -17,11 +17,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/minisat)
 
 add_subdirectory(helper)
-add_subdirectory(prod-cons)
-add_subdirectory(tim)
-add_subdirectory(lk)
+
 add_subdirectory(tinout)
-add_subdirectory(kill-ex)
+
 
 add_executable(input input.cpp)
 # link minisat library with the main executable
