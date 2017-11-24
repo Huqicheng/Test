@@ -31,7 +31,7 @@ int main(){
         else{
                 void *result_cnf, *result_approx1, *result_approx2, *result_print;
                 
-               // mulock(LOCK, &l);
+                mulock(LOCK, &mc);
                 // Create thread for CNF_SAT_VC
                 if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx2");
