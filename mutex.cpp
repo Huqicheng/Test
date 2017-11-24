@@ -3,7 +3,7 @@
 #include "helper.h"
 
 pthread_mutex_t l = PTHREAD_MUTEX_INITIALIZER;
-
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 int main(){
     
     char V;
@@ -56,7 +56,7 @@ int main(){
 //            else {
                 void *result_cnf, *result_approx1, *result_approx2, *result_print;
                 
-                //mulock(LOCK, &l);
+                mulock(LOCK, &m);
                 // Create thread for CNF_SAT_VC
                 if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx2");
@@ -495,6 +495,7 @@ void* ApproxVc2(void *graph) {
 
 void* Output(void *graph){
     
+    mulock(UNLOCK, &m);
     mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
 
