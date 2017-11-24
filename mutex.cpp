@@ -8,9 +8,10 @@ pthread_mutex_t mc = PTHREAD_MUTEX_INITIALIZER;
 int main(){
     
     char V;
-    MGraph G;
+    //MGraph G;
     pthread_t thread_cnf,thread_approx1,thread_approx2,thread_print;
     while (std::cin >> V) {
+        MGraph G;
         int flag = 10;
         if (V == 'V') {
             
