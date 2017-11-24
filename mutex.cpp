@@ -58,6 +58,10 @@ int main(){
                 
                 //mulock(LOCK, &l);
                 // Create thread for CNF_SAT_VC
+                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_approx2");
+                    exit(1);
+                }
                 if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
                     puts("fail to create pthread thread_cnf");
                     exit(1);
@@ -71,10 +75,7 @@ int main(){
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
-                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
-                    puts("fail to create pthread thread_approx2");
-                    exit(1);
-                }
+
                 if (pthread_join(thread_cnf, &result_cnf) == -1) {
                     puts("fail to recollect thread_cnf");
                     exit(1);
@@ -265,7 +266,7 @@ void* CNF_SAT_VC(void *graph){
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
     //int vertexcover[v];
-    mulock(LOCK, &l);
+
     int k = 1;
     for (k = 1; k < v; ++k) {
         for (int i = 0; i < v; ++i) {
@@ -493,8 +494,10 @@ void* ApproxVc2(void *graph) {
 }
 
 void* Output(void *graph){
+    
+    mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
-    mulock(UNLOCK, &l);
+
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
