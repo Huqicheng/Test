@@ -3,7 +3,7 @@
 #include "helper.h"
 
 pthread_mutex_t l = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 int main(){
     
     char V;
@@ -28,35 +28,9 @@ int main(){
             std::cout << "APPROX-VC-2: " << std::endl;
         }
         else{
-            
-//            int flagNoEdge = 0;
-//
-//            for (int i = 0; i < v; ++i) {
-//                if (flagNoEdge == 2) {
-//                    break;
-//                }
-//                for (int j = 0; j < v; ++j)
-//                {
-//                    if ((&G)->arc[i][j] != 0) {
-//                        flagNoEdge = 2;
-//                        break;
-//                    }
-//                    else {
-//                        /*std::cout << (&G)->arc[i][j] << std::endl;*/
-//                        flagNoEdge = 1;
-//                    }
-//
-//                }
-//            }
-//            if (flagNoEdge == 1) {
-//                std::cout << "CNF-SAT-VC: " << std::endl;
-//                std::cout << "APPROX-VC-1: " << std::endl;
-//                std::cout << "APPROX-VC-2: " << std::endl;
-//            }
-//            else {
                 void *result_cnf, *result_approx1, *result_approx2, *result_print;
                 
-                mulock(LOCK, &m);
+                mulock(LOCK, &l);
                 // Create thread for CNF_SAT_VC
                 if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx2");
@@ -495,7 +469,7 @@ void* ApproxVc2(void *graph) {
 
 void* Output(void *graph){
     
-    mulock(UNLOCK, &m);
+
     mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
 
