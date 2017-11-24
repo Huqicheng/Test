@@ -206,10 +206,10 @@ loop:
                 for (int j = 0; j < Graph->numVertexes; ++j)
                 {
                     if (i == j) {
-                        G->arc[i][j] = 0;
+                        Graph->arc[i][j] = 0;
                     }
                     else {
-                        G->arc[i][j] = 9999;
+                        Graph->arc[i][j] = 9999;
                     }
                     
                 }
@@ -361,7 +361,7 @@ void* ApproxVc1(void *graph) {
     
     for (int i = 0; i < v; ++i) {
         for (int j = 0; j < v; ++j) {
-            arc[i][j] = G->arc[i][j];
+            arc[i][j] = Graph->arc[i][j];
             /*cout << arc[i][j] << " ";*/
         }
         /*cout << endl;*/
