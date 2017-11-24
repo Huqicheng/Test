@@ -2,60 +2,102 @@
 #include "input.h"
 #include "helper.h"
 
-pthread_mutex_t write1 = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t write2 = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t write3 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t l = PTHREAD_MUTEX_INITIALIZER;
 
 int main(){
     
-    //char V;
+    char V;
     MGraph G;
-    
     pthread_t thread_cnf,thread_approx1,thread_approx2,thread_print;
-    
-    void *result_cnf, *result_approx1, *result_approx2, *result_print;
-    
-    if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
-        puts("fail to create pthread thread_approx2");
-        exit(1);
+    while (std::cin >> V) {
+        int flag = 10;
+        if (V == 'V') {
+            
+            flag = CreateMGraph(&G);
+            if (flag == 0) {
+                goto end;
+            }
+        }
+        if (flag == 2) {
+//            printf("CNF-SAT-VC: \n");
+//            printf("APPROX-VC-1: \n");
+//            printf("APPROX-VC-2: \n");
+//            fflush(stdout);
+            std::cout <<"CNF-SAT-VC: "<<std::endl;
+            std::cout << "APPROX-VC-1: " << std::endl;
+            std::cout << "APPROX-VC-2: " << std::endl;
+        }
+        else{
+            
+//            int flagNoEdge = 0;
+//
+//            for (int i = 0; i < v; ++i) {
+//                if (flagNoEdge == 2) {
+//                    break;
+//                }
+//                for (int j = 0; j < v; ++j)
+//                {
+//                    if ((&G)->arc[i][j] != 0) {
+//                        flagNoEdge = 2;
+//                        break;
+//                    }
+//                    else {
+//                        /*std::cout << (&G)->arc[i][j] << std::endl;*/
+//                        flagNoEdge = 1;
+//                    }
+//
+//                }
+//            }
+//            if (flagNoEdge == 1) {
+//                std::cout << "CNF-SAT-VC: " << std::endl;
+//                std::cout << "APPROX-VC-1: " << std::endl;
+//                std::cout << "APPROX-VC-2: " << std::endl;
+//            }
+//            else {
+                void *result_cnf, *result_approx1, *result_approx2, *result_print;
+                
+                // Create thread for CNF_SAT_VC
+                if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_cnf");
+                    exit(1);
+                }
+                if (pthread_join(thread_cnf, &result_cnf) == -1) {
+                    puts("fail to recollect thread_cnf");
+                    exit(1);
+                }
+                if (pthread_create(&thread_approx1, NULL, &ApproxVc1, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_approx1");
+                    exit(1);
+                }
+                if (pthread_join(thread_approx1, &result_approx1) == -1) {
+                    puts("fail to recollect thread_approx1");
+                    exit(1);
+                }
+                if (pthread_create(&thread_approx2, NULL, &ApproxVc2, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_approx2");
+                    exit(1);
+                }
+                // Wait thread terminate
+                if (pthread_join(thread_approx2, &result_approx2) == -1) {
+                    puts("fail to recollect thread_approx2");
+                    exit(1);
+                }
+                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_approx2");
+                    exit(1);
+                }
+                // Wait thread terminate
+                if (pthread_join(thread_print, &result_print) == -1) {
+                    puts("fail to recollect thread_approx2");
+                    exit(1);
+               // }
+                }
+            
+        }
+        
     }
     
-    // Create thread for CNF_SAT_VC
-    if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
-        puts("fail to create pthread thread_cnf");
-        exit(1);
-    }
-    if (pthread_join(thread_cnf, &result_cnf) == -1) {
-        puts("fail to recollect thread_cnf");
-        exit(1);
-    }
-    if (pthread_create(&thread_approx1, NULL, &ApproxVc1, (void *)&G) == -1) {
-        puts("fail to create pthread thread_approx1");
-        exit(1);
-    }
-    if (pthread_join(thread_approx1, &result_approx1) == -1) {
-        puts("fail to recollect thread_approx1");
-        exit(1);
-    }
-    if (pthread_create(&thread_approx2, NULL, &ApproxVc2, (void *)&G) == -1) {
-        puts("fail to create pthread thread_approx2");
-        exit(1);
-    }
-    // Wait thread terminate
-    if (pthread_join(thread_approx2, &result_approx2) == -1) {
-        puts("fail to recollect thread_approx2");
-        exit(1);
-    }
-    
-    // Wait thread terminate
-    if (pthread_join(thread_print, &result_print) == -1) {
-        puts("fail to recollect thread_approx2");
-        exit(1);
-        // }
-    }
-    
-    
-  return 0;
+end:    return 0;
 }
 
 
@@ -302,22 +344,21 @@ void* CNF_SAT_VC(void *graph){
         
     }
     G-> cnf_size = k;
-    mulock(UNLOCK, &write1);
     //G -> *cnf_vc = vertexcover;
-    //    std::cout << "CNF-SAT-VC: ";
-    //    if (k == v) {
-    //        for (int i = 0; i < (v - 1); ++i) {
-    //            std::cout << i << " ";
-    //        }
-    //        std::cout << v - 1 << std::endl;
-    //    }
-    //    else {
-    //        for (int i = 0; i < (k - 1); ++i) {
-    //            std::cout << vertexcover[i] << ",";
-    //        }
-    //        std::cout << vertexcover[k - 1] << std::endl;
-    //    }
-    
+//    std::cout << "CNF-SAT-VC: ";
+//    if (k == v) {
+//        for (int i = 0; i < (v - 1); ++i) {
+//            std::cout << i << " ";
+//        }
+//        std::cout << v - 1 << std::endl;
+//    }
+//    else {
+//        for (int i = 0; i < (k - 1); ++i) {
+//            std::cout << vertexcover[i] << ",";
+//        }
+//        std::cout << vertexcover[k - 1] << std::endl;
+//    }
+    //mulock(UNLOCK, &l);
     return NULL;
     
 }
@@ -377,15 +418,14 @@ void* ApproxVc1(void *graph) {
         }
         
     }
-    
+
     sort(G -> approx1_vc, G -> approx1_vc + count - 1);
     G-> approx1_size = count;
-    mulock(UNLOCK, &write2);
-    //    std::cout << "APPROX-VC-1: ";
-    //    for (int i = 0; i < count - 2; ++i) {
-    //        std::cout << S[i] << ",";
-    //    }
-    //    std::cout << S[count - 2] << std::endl;
+//    std::cout << "APPROX-VC-1: ";
+//    for (int i = 0; i < count - 2; ++i) {
+//        std::cout << S[i] << ",";
+//    }
+//    std::cout << S[count - 2] << std::endl;
     return NULL;
 }
 
@@ -421,9 +461,9 @@ void* ApproxVc2(void *graph) {
                     }
                 }
                 if (flagIn == 2) {
-                    G -> approx2_vc[count1] = i;
+                     G -> approx2_vc[count1] = i;
                     count1++;
-                    G -> approx2_vc[count1] = j;
+                     G -> approx2_vc[count1] = j;
                     count1++;
                     for (int k = 0; k < v; ++k) {
                         arc[i][k] = 0;
@@ -438,61 +478,39 @@ void* ApproxVc2(void *graph) {
     }
     sort( G -> approx2_vc,  G -> approx2_vc + count1);
     G-> approx2_size = count1;
-    mulock(UNLOCK, &write3);
-    //    std::cout << "APPROX-VC-2: ";
-    //    for (int i = 0; i < count1 - 1; ++i) {
-    //        std::cout << vertexCover[i] << ",";
-    //    }
-    //    std::cout << vertexCover[count1 - 1] << std::endl;
+//    std::cout << "APPROX-VC-2: ";
+//    for (int i = 0; i < count1 - 1; ++i) {
+//        std::cout << vertexCover[i] << ",";
+//    }
+//    std::cout << vertexCover[count1 - 1] << std::endl;
     return NULL;
 }
 
 void* Output(void *graph){
-    
     MGraph * G = (MGraph *)graph;
-    char V;
     
-    while (std::cin >> V) {
-        int flag = 10;
-        if (V == 'V') {
-            
-            flag = CreateMGraph(G);
-            if (flag == 0) {
-                goto end;
-            }
-        }
-        if (flag == 2) {
-            std::cout <<"CNF-SAT-VC: "<<std::endl;
-            std::cout << "APPROX-VC-1: " << std::endl;
-            std::cout << "APPROX-VC-2: " << std::endl;
-        }
-        else{
-            
-            mulock(LOCK, &write1);
-            //Output CNF-SAT result
-            std::cout << "CNF-SAT-VC: ";
-            
-            for (int i = 0; i < (G ->cnf_size - 1); ++i) {
-                std::cout << G -> cnf_vc[i] << ",";
-            }
-            std::cout << G -> cnf_vc[G ->cnf_size - 1] << std::endl;
-            
-            mulock(LOCK, &write2);
-            //Output APPROX1 result
-            std::cout << "APPROX-VC-1: ";
-            for (int i = 0; i < G ->approx1_size - 2; ++i) {
-                std::cout << G ->approx1_vc[i] << ",";
-            }
-            std::cout << G ->approx1_vc[G ->approx1_size - 2] << std::endl;
-            
-            mulock(LOCK, &write3);
-            //Output APPROX2 result
-            std::cout << "APPROX-VC-2: ";
-            for (int i = 0; i < G ->approx2_size - 1; ++i) {
-                std::cout << G ->approx2_vc[i] << ",";
-            }
-            std::cout << G ->approx2_vc[G ->approx2_size - 1] << std::endl;
-        }
+    
+    //Output CNF-SAT result
+    std::cout << "CNF-SAT-VC: ";
+    
+    for (int i = 0; i < (G ->cnf_size - 1); ++i) {
+        std::cout << G -> cnf_vc[i] << ",";
     }
-end:return NULL;
+    std::cout << G -> cnf_vc[G ->cnf_size - 1] << std::endl;
+    mulock(LOCK, &l);
+    //Output APPROX1 result
+    std::cout << "APPROX-VC-1: ";
+    for (int i = 0; i < G ->approx1_size - 2; ++i) {
+        std::cout << G ->approx1_vc[i] << ",";
+    }
+    std::cout << G ->approx1_vc[G ->approx1_size - 2] << std::endl;
+    
+    //Output APPROX2 result
+    std::cout << "APPROX-VC-2: ";
+    for (int i = 0; i < G ->approx2_size - 1; ++i) {
+        std::cout << G ->approx2_vc[i] << ",";
+    }
+    std::cout << G ->approx2_vc[G ->approx2_size - 1] << std::endl;
+    return NULL;
 }
+
