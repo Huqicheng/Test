@@ -256,6 +256,7 @@ loop:
 /* CNF - SAT - VC                                                       */
 /************************************************************************/
 void* CNF_SAT_VC(void *graph){
+    mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
@@ -497,7 +498,7 @@ void* Output(void *graph){
         std::cout << G -> cnf_vc[i] << ",";
     }
     std::cout << G -> cnf_vc[G ->cnf_size - 1] << std::endl;
-    mulock(LOCK, &l);
+    
     //Output APPROX1 result
     std::cout << "APPROX-VC-1: ";
     for (int i = 0; i < G ->approx1_size - 2; ++i) {
