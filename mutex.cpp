@@ -31,10 +31,10 @@ int main(){
         }
         else{
                 void *result_cnf, *result_approx1, *result_approx2, *result_print;
-                
+                int i = 1;
                 //mulock(LOCK, &mc);
                 // Create thread for CNF_SAT_VC
-                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
+                if (pthread_create(&thread_print, NULL, &Output, (void *)&i) == -1) {
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
@@ -471,33 +471,34 @@ void* ApproxVc2(void *graph) {
     return NULL;
 }
 
-void* Output(void *graph){
+void* Output(void *i){
     
     //std::cout << "BALABALA\n ";
-    MGraph * G = (MGraph *)graph;
-    
     mulock(LOCK, &mc);
+    
+    MGraph * Graph = &G;
+   
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
-    for (int i = 0; i < (G ->cnf_size - 1); ++i) {
-        std::cout << G -> cnf_vc[i] << ",";
+    for (int i = 0; i < (*Graph ->cnf_size - 1); ++i) {
+        std::cout << *Graph -> cnf_vc[i] << ",";
     }
-    std::cout << G -> cnf_vc[G ->cnf_size - 1] << std::endl;
+    std::cout << *Graph -> cnf_vc[*Graph ->cnf_size - 1] << std::endl;
     
     //Output APPROX1 result
     std::cout << "APPROX-VC-1: ";
-    for (int i = 0; i < G ->approx1_size - 2; ++i) {
-        std::cout << G ->approx1_vc[i] << ",";
+    for (int i = 0; i < *Graph ->approx1_size - 2; ++i) {
+        std::cout << *Graph ->approx1_vc[i] << ",";
     }
-    std::cout << G ->approx1_vc[G ->approx1_size - 2] << std::endl;
+    std::cout << *Graph ->approx1_vc[*Graph ->approx1_size - 2] << std::endl;
     
     //Output APPROX2 result
     std::cout << "APPROX-VC-2: ";
-    for (int i = 0; i < G ->approx2_size - 1; ++i) {
-        std::cout << G ->approx2_vc[i] << ",";
+    for (int i = 0; i < *Graph ->approx2_size - 1; ++i) {
+        std::cout << *Graph ->approx2_vc[i] << ",";
     }
-    std::cout << G ->approx2_vc[G ->approx2_size - 1] << std::endl;
+    std::cout << *Graph ->approx2_vc[*Graph ->approx2_size - 1] << std::endl;
     return NULL;
 }
 
