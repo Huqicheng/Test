@@ -481,24 +481,24 @@ void* Output(void *i){
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
-    for (int i = 0; i < (*Graph ->cnf_size - 1); ++i) {
-        std::cout << *Graph -> cnf_vc[i] << ",";
+    for (int i = 0; i < (Graph ->cnf_size - 1); ++i) {
+        std::cout << Graph -> cnf_vc[i] << ",";
     }
-    std::cout << *Graph -> cnf_vc[*Graph ->cnf_size - 1] << std::endl;
+    std::cout << Graph -> cnf_vc[Graph ->cnf_size - 1] << std::endl;
     
     //Output APPROX1 result
     std::cout << "APPROX-VC-1: ";
-    for (int i = 0; i < *Graph ->approx1_size - 2; ++i) {
-        std::cout << *Graph ->approx1_vc[i] << ",";
+    for (int i = 0; i < Graph ->approx1_size - 2; ++i) {
+        std::cout << Graph ->approx1_vc[i] << ",";
     }
-    std::cout << *Graph ->approx1_vc[*Graph ->approx1_size - 2] << std::endl;
+    std::cout << Graph ->approx1_vc[Graph ->approx1_size - 2] << std::endl;
     
     //Output APPROX2 result
     std::cout << "APPROX-VC-2: ";
-    for (int i = 0; i < *Graph ->approx2_size - 1; ++i) {
-        std::cout << *Graph ->approx2_vc[i] << ",";
+    for (int i = 0; i < Graph ->approx2_size - 1; ++i) {
+        std::cout << Graph ->approx2_vc[i] << ",";
     }
-    std::cout << *Graph ->approx2_vc[*Graph ->approx2_size - 1] << std::endl;
+    std::cout << Graph ->approx2_vc[Graph ->approx2_size - 1] << std::endl;
     return NULL;
 }
 
