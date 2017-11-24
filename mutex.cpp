@@ -58,6 +58,13 @@ int main(){
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
+            
+                // Wait thread terminate
+                if (pthread_join(thread_print, &result_print) == -1) {
+                    puts("fail to recollect thread_approx2");
+                    exit(1);
+               // }
+                }
 
                 // Wait thread terminate
                 if (pthread_join(thread_approx2, &result_approx2) == -1) {
@@ -65,12 +72,7 @@ int main(){
                     exit(1);
                 }
 
-                // Wait thread terminate
-                if (pthread_join(thread_print, &result_print) == -1) {
-                    puts("fail to recollect thread_approx2");
-                    exit(1);
-               // }
-                }
+
             
         }
         
