@@ -56,37 +56,39 @@ int main(){
 //            else {
                 void *result_cnf, *result_approx1, *result_approx2, *result_print;
                 
-                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
-                    puts("fail to create pthread thread_approx2");
-                    exit(1);
-                }
+
                 // Create thread for CNF_SAT_VC
                 if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
                     puts("fail to create pthread thread_cnf");
                     exit(1);
                 }
-                if (pthread_join(thread_cnf, &result_cnf) == -1) {
-                    puts("fail to recollect thread_cnf");
-                    exit(1);
-                }
+
                 if (pthread_create(&thread_approx1, NULL, &ApproxVc1, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx1");
-                    exit(1);
-                }
-                if (pthread_join(thread_approx1, &result_approx1) == -1) {
-                    puts("fail to recollect thread_approx1");
                     exit(1);
                 }
                 if (pthread_create(&thread_approx2, NULL, &ApproxVc2, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
+                if (pthread_join(thread_cnf, &result_cnf) == -1) {
+                    puts("fail to recollect thread_cnf");
+                    exit(1);
+                }            
+                if (pthread_join(thread_approx1, &result_approx1) == -1) {
+                    puts("fail to recollect thread_approx1");
+                    exit(1);
+                }
+
                 // Wait thread terminate
                 if (pthread_join(thread_approx2, &result_approx2) == -1) {
                     puts("fail to recollect thread_approx2");
                     exit(1);
                 }
-
+                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
+                    puts("fail to create pthread thread_approx2");
+                    exit(1);
+                }
                 // Wait thread terminate
                 if (pthread_join(thread_print, &result_print) == -1) {
                     puts("fail to recollect thread_approx2");
@@ -257,7 +259,7 @@ loop:
 /* CNF - SAT - VC                                                       */
 /************************************************************************/
 void* CNF_SAT_VC(void *graph){
-    mulock(UNLOCK, &l);
+    mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
@@ -491,7 +493,6 @@ void* ApproxVc2(void *graph) {
 void* Output(void *graph){
     MGraph * G = (MGraph *)graph;
     
-    mulock(LOCK, &l);
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
