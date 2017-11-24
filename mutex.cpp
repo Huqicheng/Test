@@ -260,11 +260,12 @@ loop:
 /* CNF - SAT - VC                                                       */
 /************************************************************************/
 void* CNF_SAT_VC(void *graph){
-    mulock(LOCK, &l);
+    
     MGraph * G = (MGraph *)graph;
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
     //int vertexcover[v];
+    mulock(LOCK, &l);
     int k = 1;
     for (k = 1; k < v; ++k) {
         for (int i = 0; i < v; ++i) {
