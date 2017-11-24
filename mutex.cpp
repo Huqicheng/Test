@@ -494,7 +494,7 @@ void* ApproxVc2(void *graph) {
 
 void* Output(void *graph){
     MGraph * G = (MGraph *)graph;
-    
+    mulock(LOCK, &l);
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
