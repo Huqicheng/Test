@@ -469,7 +469,7 @@ void* ApproxVc2(void *graph) {
 
 void* Output(void *graph){
     
-
+    std::cout << "BALABALA\n ";
     mulock(LOCK, &l);
     MGraph * G = (MGraph *)graph;
 
