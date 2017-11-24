@@ -1,7 +1,7 @@
 
 #include "input.h"
 #include "helper.h"
-MGraph *G;
+MGraph G;
 
 pthread_mutex_t mc = PTHREAD_MUTEX_INITIALIZER;
 //pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
@@ -15,7 +15,7 @@ int main(){
         int flag = 10;
         if (V == 'V') {
             
-            flag = CreateMGraph(G);
+            flag = CreateMGraph(&G);
             if (flag == 0) {
                 goto end;
             }
@@ -34,7 +34,7 @@ int main(){
                 
                 //mulock(LOCK, &mc);
                 // Create thread for CNF_SAT_VC
-                if (pthread_create(&thread_print, NULL, &Output, NULL) == -1) {
+                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
@@ -471,10 +471,10 @@ void* ApproxVc2(void *graph) {
     return NULL;
 }
 
-void* Output(){
+void* Output(void *graph){
     
     //std::cout << "BALABALA\n ";
-   // MGraph * G = (MGraph *)graph;
+    MGraph * G = (MGraph *)graph;
     
     mulock(LOCK, &mc);
     //Output CNF-SAT result
