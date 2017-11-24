@@ -15,7 +15,7 @@ int main(){
         int flag = 10;
         if (V == 'V') {
             
-            flag = CreateMGraph(&G);
+            flag = CreateMGraph(G);
             if (flag == 0) {
                 goto end;
             }
