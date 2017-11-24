@@ -465,7 +465,7 @@ void* ApproxVc2(void *graph) {
 //        std::cout << vertexCover[i] << ",";
 //    }
 //    std::cout << vertexCover[count1 - 1] << std::endl;
-    //mulock(UNLOCK, &m2);
+    mulock(UNLOCK, &mc);
     return NULL;
 }
 
