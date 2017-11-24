@@ -1,6 +1,7 @@
 
 #include "input.h"
 #include "helper.h"
+MGraph G;
 
 pthread_mutex_t mc = PTHREAD_MUTEX_INITIALIZER;
 //pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
@@ -11,7 +12,6 @@ int main(){
     //MGraph G;
     pthread_t thread_cnf,thread_approx1,thread_approx2,thread_print;
     while (std::cin >> V) {
-        MGraph G;
         int flag = 10;
         if (V == 'V') {
             
@@ -34,7 +34,7 @@ int main(){
                 
                 //mulock(LOCK, &mc);
                 // Create thread for CNF_SAT_VC
-                if (pthread_create(&thread_print, NULL, &Output, (void *)&G) == -1) {
+                if (pthread_create(&thread_print, NULL, &Output, NULL) == -1) {
                     puts("fail to create pthread thread_approx2");
                     exit(1);
                 }
@@ -82,12 +82,12 @@ end:    return 0;
 }
 
 
-int CreateMGraph(MGraph *G)
+int CreateMGraph(MGraph *Graph)
 {
 loop:
     int i, j, k;
     std::cin >> v;
-    G->numVertexes = v;    //input the number of vertices
+    Graph->numVertexes = v;    //input the number of vertices
     char E;
     int num = (v + 1)*(v + 1) * 7;
     char *p = new char[num];
@@ -195,15 +195,15 @@ loop:
                 stringFinal[i] = stringPointer[i];
             }
             delete[]stringPointer;
-            G->numEdges = countFigure - DecNum;
+            Graph->numEdges = countFigure - DecNum;
             //std::cout << G->numEdges << std::endl;
             
             std::cin.clear();
             
             
             
-            for (int i = 0; i < G->numVertexes; ++i) {
-                for (int j = 0; j < G->numVertexes; ++j)
+            for (int i = 0; i < Graph->numVertexes; ++i) {
+                for (int j = 0; j < Graph->numVertexes; ++j)
                 {
                     if (i == j) {
                         G->arc[i][j] = 0;
@@ -215,12 +215,12 @@ loop:
                 }
             }
             
-            for (int k = 0; k < G->numEdges; k=k+2){
+            for (int k = 0; k < Graph->numEdges; k=k+2){
                 i = stringFinal[k];
                 j = stringFinal[k + 1];
                 if (i != j) {
-                    G->arc[i][j] = 1;
-                    G->arc[j][i] = G->arc[i][j];
+                    Graph->arc[i][j] = 1;
+                    Graph->arc[j][i] = Graph->arc[i][j];
                 }
             }
             
@@ -238,7 +238,7 @@ loop:
 /************************************************************************/
 void* CNF_SAT_VC(void *graph){
     //mulock(UNLOCK, &l);
-    MGraph * G = (MGraph *)graph;
+    MGraph * Graph = (MGraph *)graph;
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
     //int vertexcover[v];
@@ -290,11 +290,11 @@ void* CNF_SAT_VC(void *graph){
         }
         //std::cout << "3" << " ";
         int count = 0;
-        Minisat::vec<Minisat::Lit> constr4[(G->numEdges) * 2];
+        Minisat::vec<Minisat::Lit> constr4[(Graph->numEdges) * 2];
         for (int i = 0; i < v; ++i) {
             for (int j = 0; j < v; ++j)
             {
-                if ((G->arc[i][j]) == 1) {
+                if ((Graph->arc[i][j]) == 1) {
                     for (int m = 0; m < k; ++m) {
                         constr4[count].push(x[i][m]);
                         constr4[count].push(x[j][m]);
@@ -312,7 +312,7 @@ void* CNF_SAT_VC(void *graph){
             for (int i = 0; i < v; ++i) {
                 for (int j = 0; j < k; ++j) {
                     if (Minisat::toInt(solver->modelValue(x[i][j])) == 0) {
-                        G -> cnf_vc[m] = i;
+                        Graph -> cnf_vc[m] = i;
                         m++;
                     }
                 }
@@ -326,7 +326,7 @@ void* CNF_SAT_VC(void *graph){
         }
         
     }
-    G-> cnf_size = k;
+    Graph-> cnf_size = k;
     //G -> *cnf_vc = vertexcover;
 //    std::cout << "CNF-SAT-VC: ";
 //    if (k == v) {
@@ -350,7 +350,7 @@ void* CNF_SAT_VC(void *graph){
 /************************************************************************/
 void* ApproxVc1(void *graph) {
     /*check if the matrix is 0*/
-    MGraph * G = (MGraph *)graph;
+    MGraph * Graph = (MGraph *)graph;
     int degree[v];
     
     int max = -1;
@@ -393,7 +393,7 @@ void* ApproxVc1(void *graph) {
                 index = i;
             }
         }
-        G -> approx1_vc[count] = index;
+        Graph -> approx1_vc[count] = index;
         count++;
         for (int i = 0; i < v; ++i) {
             arc[index][i] = 0;
@@ -402,8 +402,8 @@ void* ApproxVc1(void *graph) {
         
     }
 
-    sort(G -> approx1_vc, G -> approx1_vc + count - 1);
-    G-> approx1_size = count;
+    sort(Graph -> approx1_vc, Graph -> approx1_vc + count - 1);
+    Graph-> approx1_size = count;
 //    std::cout << "APPROX-VC-1: ";
 //    for (int i = 0; i < count - 2; ++i) {
 //        std::cout << S[i] << ",";
@@ -418,17 +418,17 @@ void* ApproxVc1(void *graph) {
 /* APPROX - VC - 2                                                                 */
 /************************************************************************/
 void* ApproxVc2(void *graph) {
-    MGraph * G = (MGraph *)graph;
+    MGraph * Graph = (MGraph *)graph;
     //int vertexCover[v];
     int arc[v][v];
     for (int i = 0; i < v; ++i) {
         for (int j = 0; j < v; ++j) {
-            arc[i][j] = G->arc[i][j];
+            arc[i][j] = Graph->arc[i][j];
         }
     }
     
     for (int i = 0; i < v; ++i) {
-        G -> approx2_vc[i] = -1;
+        Graph -> approx2_vc[i] = -1;
     }
     int count1 = 0;
     int flagIn = 0;
@@ -436,7 +436,7 @@ void* ApproxVc2(void *graph) {
         for (int j = 0; j < v; ++j) {
             if (arc[i][j] == 1) {
                 for (int k = 0; k < v; ++k) {
-                    if (( G -> approx2_vc[k] == i) || ( G -> approx2_vc[k] == j)) {
+                    if (( Graph -> approx2_vc[k] == i) || ( Graph -> approx2_vc[k] == j)) {
                         flagIn = 1;
                         break;
                     }
@@ -445,9 +445,9 @@ void* ApproxVc2(void *graph) {
                     }
                 }
                 if (flagIn == 2) {
-                     G -> approx2_vc[count1] = i;
+                     Graph -> approx2_vc[count1] = i;
                     count1++;
-                     G -> approx2_vc[count1] = j;
+                     Graph -> approx2_vc[count1] = j;
                     count1++;
                     for (int k = 0; k < v; ++k) {
                         arc[i][k] = 0;
@@ -460,8 +460,8 @@ void* ApproxVc2(void *graph) {
             }
         }
     }
-    sort( G -> approx2_vc,  G -> approx2_vc + count1);
-    G-> approx2_size = count1;
+    sort( Graph -> approx2_vc,  Graph -> approx2_vc + count1);
+    Graph-> approx2_size = count1;
 //    std::cout << "APPROX-VC-2: ";
 //    for (int i = 0; i < count1 - 1; ++i) {
 //        std::cout << vertexCover[i] << ",";
@@ -471,10 +471,10 @@ void* ApproxVc2(void *graph) {
     return NULL;
 }
 
-void* Output(void *graph){
+void* Output(){
     
-    std::cout << "BALABALA\n ";
-    MGraph * G = (MGraph *)graph;
+    //std::cout << "BALABALA\n ";
+   // MGraph * G = (MGraph *)graph;
     
     mulock(LOCK, &mc);
     //Output CNF-SAT result
