@@ -261,7 +261,7 @@ loop:
 /* CNF - SAT - VC                                                       */
 /************************************************************************/
 void* CNF_SAT_VC(void *graph){
-    
+    mulock(UNLOCK, &l);
     MGraph * G = (MGraph *)graph;
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
