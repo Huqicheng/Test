@@ -1,85 +1,78 @@
-
 #include "input.h"
 #include "helper.h"
 MGraph G;
 
 pthread_mutex_t mc = PTHREAD_MUTEX_INITIALIZER;
-//pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
 //pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
 int main(){
     
-    char V;
-    pthread_t thread_cnf,thread_approx1,thread_approx2,thread_print;
-    while (std::cin >> V) {
+    while(1){
+    pthread_t thread_cnf,thread_approx1,thread_approx2,thread_print,thread_stdin;
+    mc = PTHREAD_MUTEX_INITIALIZER;
+    //else{
+    void *result_cnf, *result_approx1, *result_approx2, *result_print,*result_stdin;
+    int i = 1;
+    
+   
+    
+    if (pthread_create(&thread_stdin, NULL, &Read, (void *)&i) == -1) {
+        puts("fail to create pthread thread_approx2");
+        exit(1);
+     }
+    if (pthread_join(thread_stdin, &result_stdin) == -1) {
+        puts("fail to recollect thread_approx2");
+         exit(1);
+     }
+    
+    mulock(LOCK, &mc);
+    mulock(LOCK, &m1);
+    // Create thread for I/O
+    if (pthread_create(&thread_print, NULL, &Output, (void *)&i) == -1) {
+        puts("fail to create pthread thread_approx2");
+        exit(1);
+    }
 
-        mc = PTHREAD_MUTEX_INITIALIZER;
-        int flag = 10;
-        if (V == 'V') {
-            
-            flag = CreateMGraph(&G);
-            if (flag == 0) {
-                goto end;
-            }
-        }
-        if (flag == 2) {
-//            printf("CNF-SAT-VC: \n");
-//            printf("APPROX-VC-1: \n");
-//            printf("APPROX-VC-2: \n");
-//            fflush(stdout);
-            std::cout <<"CNF-SAT-VC: "<<std::endl;
-            std::cout << "APPROX-VC-1: " << std::endl;
-            std::cout << "APPROX-VC-2: " << std::endl;
-        }
-        else{
-                void *result_cnf, *result_approx1, *result_approx2, *result_print;
-                int i = 1;
-                //mulock(LOCK, &mc);
-                // Create thread for CNF_SAT_VC
-                if (pthread_create(&thread_print, NULL, &Output, (void *)&i) == -1) {
-                    puts("fail to create pthread thread_approx2");
-                    exit(1);
-                }
-                if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
-                    puts("fail to create pthread thread_cnf");
-                    exit(1);
-                }
-                if (pthread_join(thread_cnf, &result_cnf) == -1) {
-                    puts("fail to recollect thread_cnf");
-                    exit(1);
-                } 
-
-                if (pthread_create(&thread_approx1, NULL, &ApproxVc1, (void *)&G) == -1) {
-                    puts("fail to create pthread thread_approx1");
-                    exit(1);
-                }
-                if (pthread_join(thread_approx1, &result_approx1) == -1) {
-                    puts("fail to recollect thread_approx1");
-                    exit(1);
-                }
-                if (pthread_create(&thread_approx2, NULL, &ApproxVc2, (void *)&G) == -1) {
-                    puts("fail to create pthread thread_approx2");
-                    exit(1);
-                }
-
-                // Wait thread terminate
-                if (pthread_join(thread_approx2, &result_approx2) == -1) {
-                    puts("fail to recollect thread_approx2");
-                    exit(1);
-                }
-                // Wait thread terminate
-                if (pthread_join(thread_print, &result_print) == -1) {
-                    puts("fail to recollect thread_approx2");
-                    exit(1);
-               // }
-                }
-
-
-            
-        }
-        
+    if (pthread_create(&thread_cnf, NULL, &CNF_SAT_VC, (void *)&G) == -1) {
+        puts("fail to create pthread thread_cnf");
+        exit(1);
+    }
+    if (pthread_join(thread_cnf, &result_cnf) == -1) {
+        puts("fail to recollect thread_cnf");
+        exit(1);
     }
     
-end:    return 0;
+    if (pthread_create(&thread_approx1, NULL, &ApproxVc1, (void *)&G) == -1) {
+        puts("fail to create pthread thread_approx1");
+        exit(1);
+    }
+    if (pthread_join(thread_approx1, &result_approx1) == -1) {
+        puts("fail to recollect thread_approx1");
+        exit(1);
+    }
+    if (pthread_create(&thread_approx2, NULL, &ApproxVc2, (void *)&G) == -1) {
+        puts("fail to create pthread thread_approx2");
+        exit(1);
+    }
+    
+    // Wait thread terminate
+    if (pthread_join(thread_approx2, &result_approx2) == -1) {
+        puts("fail to recollect thread_approx2");
+        exit(1);
+    }
+    // Wait thread terminate
+    if (pthread_join(thread_print, &result_print) == -1) {
+        puts("fail to recollect thread_approx2");
+        exit(1);
+    }
+    
+    
+    
+     }
+    
+    //}
+    return 0;
+    //end:    return 0;
 }
 
 
@@ -243,7 +236,7 @@ void* CNF_SAT_VC(void *graph){
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     Minisat::Lit x[MAXVEX][MAXVEX];
     //int vertexcover[v];
-
+    
     int k = 1;
     for (k = 1; k < v; ++k) {
         for (int i = 0; i < v; ++i) {
@@ -329,25 +322,25 @@ void* CNF_SAT_VC(void *graph){
     }
     Graph-> cnf_size = k;
     //G -> *cnf_vc = vertexcover;
-//    std::cout << "CNF-SAT-VC: ";
-//    if (k == v) {
-//        for (int i = 0; i < (v - 1); ++i) {
-//            std::cout << i << " ";
-//        }
-//        std::cout << v - 1 << std::endl;
-//    }
-//    else {
-//        for (int i = 0; i < (k - 1); ++i) {
-//            std::cout << vertexcover[i] << ",";
-//        }
-//        std::cout << vertexcover[k - 1] << std::endl;
-//    }
-//     mulock(UNLOCK, &mc);
+    //    std::cout << "CNF-SAT-VC: ";
+    //    if (k == v) {
+    //        for (int i = 0; i < (v - 1); ++i) {
+    //            std::cout << i << " ";
+    //        }
+    //        std::cout << v - 1 << std::endl;
+    //    }
+    //    else {
+    //        for (int i = 0; i < (k - 1); ++i) {
+    //            std::cout << vertexcover[i] << ",";
+    //        }
+    //        std::cout << vertexcover[k - 1] << std::endl;
+    //    }
+    //     mulock(UNLOCK, &mc);
     return NULL;
     
 }
 /************************************************************************/
-/* APPROX - VC - 1                                                                 */
+/* APPROX - VC - 1                                                      */
 /************************************************************************/
 void* ApproxVc1(void *graph) {
     /*check if the matrix is 0*/
@@ -402,21 +395,21 @@ void* ApproxVc1(void *graph) {
         }
         
     }
-
+    
     sort(Graph -> approx1_vc, Graph -> approx1_vc + count - 1);
     Graph-> approx1_size = count;
-//    std::cout << "APPROX-VC-1: ";
-//    for (int i = 0; i < count - 2; ++i) {
-//        std::cout << S[i] << ",";
-//    }
-//    std::cout << S[count - 2] << std::endl;
+    //    std::cout << "APPROX-VC-1: ";
+    //    for (int i = 0; i < count - 2; ++i) {
+    //        std::cout << S[i] << ",";
+    //    }
+    //    std::cout << S[count - 2] << std::endl;
     //mulock(UNLOCK, &m1);
     return NULL;
 }
 
 
 /************************************************************************/
-/* APPROX - VC - 2                                                                 */
+/* APPROX - VC - 2                                                      */
 /************************************************************************/
 void* ApproxVc2(void *graph) {
     MGraph * Graph = (MGraph *)graph;
@@ -446,9 +439,9 @@ void* ApproxVc2(void *graph) {
                     }
                 }
                 if (flagIn == 2) {
-                     Graph -> approx2_vc[count1] = i;
+                    Graph -> approx2_vc[count1] = i;
                     count1++;
-                     Graph -> approx2_vc[count1] = j;
+                    Graph -> approx2_vc[count1] = j;
                     count1++;
                     for (int k = 0; k < v; ++k) {
                         arc[i][k] = 0;
@@ -463,23 +456,76 @@ void* ApproxVc2(void *graph) {
     }
     sort( Graph -> approx2_vc,  Graph -> approx2_vc + count1);
     Graph-> approx2_size = count1;
-//    std::cout << "APPROX-VC-2: ";
-//    for (int i = 0; i < count1 - 1; ++i) {
-//        std::cout << vertexCover[i] << ",";
-//    }
-//    std::cout << vertexCover[count1 - 1] << std::endl;
+    //    std::cout << "APPROX-VC-2: ";
+    //    for (int i = 0; i < count1 - 1; ++i) {
+    //        std::cout << vertexCover[i] << ",";
+    //    }
+    //    std::cout << vertexCover[count1 - 1] << std::endl;
     //sleep(3);
+    mulock(UNLOCK, &mc);
+    return NULL;
+}
+
+/************************************************************************/
+/* Output-Result                                                        */
+/************************************************************************/
+
+void* Read(void *i){
+   //MGraph * Graph = (MGraph *)graph;
+    //mulock(LOCK, &m1);
+    char V;
+    if(std::cin >> V) {
+        int flag = 10;
+        if (V == 'V') {
+
+            flag = CreateMGraph(&G);
+            if (flag == 0) {
+                //goto end;
+                return NULL;
+            }
+        }
+        if (flag == 2) {
+
+            std::cout <<"CNF-SAT-VC: "<<std::endl;
+            std::cout << "APPROX-VC-1: " << std::endl;
+            std::cout << "APPROX-VC-2: " << std::endl;
+        }
+        }
     //mulock(UNLOCK, &mc);
     return NULL;
 }
 
+
 void* Output(void *i){
+//     mulock(UNLOCK, &mc);
+ mulock(UNLOCK, &m1);
+//     char V;
+//     if(std::cin >> V) {
+//         int flag = 10;
+//         if (V == 'V') {
+            
+//             flag = CreateMGraph(&G);
+//             if (flag == 0) {
+//                 //goto end;
+//                 return NULL;
+//             }
+//         }
+//         if (flag == 2) {
+            
+//             std::cout <<"CNF-SAT-VC: "<<std::endl;
+//             std::cout << "APPROX-VC-1: " << std::endl;
+//             std::cout << "APPROX-VC-2: " << std::endl;
+//         }
+//        else
+//            exit(1);
+//     }
+//      mulock(LOCK, &m1);
     
-    //std::cout << "BALABALA\n ";
+//     //std::cout << "BALABALA\n ";
     mulock(LOCK, &mc);
     
     MGraph * Graph = &G;
-   
+    
     //Output CNF-SAT result
     std::cout << "CNF-SAT-VC: ";
     
@@ -503,4 +549,3 @@ void* Output(void *i){
     std::cout << Graph ->approx2_vc[Graph ->approx2_size - 1] << std::endl;
     return NULL;
 }
-
