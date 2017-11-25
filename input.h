@@ -47,4 +47,5 @@ int CreateMGraph(MGraph *);
 void* CNF_SAT_VC(void *);
 void* ApproxVc1(void *);
 void* ApproxVc2(void *);
+void* Read(void *);
 void* Output(void *);
